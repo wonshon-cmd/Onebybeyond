@@ -1,6 +1,6 @@
 # Onebybeyond
 
-[onebybeyond.org](https://onebybeyond.org) 웹사이트 소스입니다.
+[onetobeyond.org](https://onetobeyond.org) 웹사이트 소스입니다.
 
 ## 구조
 
@@ -43,12 +43,12 @@ cd site && python3 -m http.server 8000
 ### 1. GitHub Pages 켜기
 GitHub 저장소 → **Settings → Pages**
 - **Source**: `GitHub Actions` 선택
-- **Custom domain**: `onebybeyond.org` 입력 후 Save
+- **Custom domain**: `onetobeyond.org` 입력 후 Save
 - DNS 확인이 끝나면 **Enforce HTTPS** 체크
 
 ### 2. 도메인 DNS 설정 (Squarespace)
 
-1. https://account.squarespace.com/domains 로그인 → `onebybeyond.org` 선택
+1. https://account.squarespace.com/domains 로그인 → `onetobeyond.org` 선택
 2. 왼쪽 메뉴 **DNS** → **DNS Settings**
 3. **Squarespace Defaults** 묶음이 있으면 오른쪽 휴지통으로 삭제 (Squarespace 사이트를 안 쓰므로)
 4. **Domain Forwarding**(도메인 포워딩)이 켜져 있으면 끄기

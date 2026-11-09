@@ -5,7 +5,7 @@
 // backend and are intentionally not part of this public build.
 
 const KEY = 'onetobeyond-public-v1';
-const SITE_URL = 'https://onebybeyond.org/';
+const SITE_URL = 'https://onetobeyond.org/';
 const YOUTUBE_ID = 'Ie07qxjnmGI';
 
 let DATA = null;
