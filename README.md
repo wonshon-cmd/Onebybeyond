@@ -5,13 +5,38 @@
 ## 구조
 
 ```
-site/            ← 웹사이트에 올라가는 파일 전부 (이 폴더가 그대로 배포됨)
-  index.html     ← 메인 페이지
-  404.html       ← 없는 주소로 들어왔을 때 페이지
-  assets/        ← 이미지, CSS, JS 등
-  CNAME          ← 커스텀 도메인 (onebybeyond.org)
+site/                ← 웹사이트에 올라가는 파일 전부 (이 폴더가 그대로 배포됨)
+  index.html         ← 페이지 뼈대
+  content.json       ← 편지 글·기도제목·사진 경로 (글 수정은 여기서)
+  style.css          ← 승인된 디자인 (Off-white Editorial Letter)
+  site.css           ← 공개용으로 추가한 작은 스타일
+  app.js             ← 화면 그리기, 하트/아멘/공유/사진/목차
+  assets/            ← 로고, 파비콘, 사진
+  404.html, CNAME
+design-package/      ← 받은 인계 패키지 원본 (배포되지 않음)
+  reference/approved-design.html  ← 디자인 최우선 기준
+  admin.html         ← 관리자 기능 참고 데모
+  AI-HANDOFF-KO.txt, DESIGN-SYSTEM.md, README-KO.md
 .github/workflows/deploy.yml  ← main 브랜치에 push 하면 GitHub Pages로 자동 배포
 ```
+
+## 현재 공개 버전에서 되는 것 / 안 되는 것
+
+| 기능 | 상태 |
+|------|------|
+| 표지 → 본문 한 페이지 스크롤, 목차, 소식지 선택, 글자 크기 | 동작 |
+| 이야기 끝 하트, 기도제목 아멘 토글 | 동작 — 단, **방문자 본인 브라우저에만 저장** (모두가 함께 보는 숫자 아님) |
+| 공유 (휴대폰 공유 메뉴 / 링크 복사) | 동작 |
+| 사진 갤러리 크게 보기 | 동작 |
+| 유튜브 ‘무명’ 미리보기 + YouTube로 이동 | 동작 |
+| 로그인, 댓글/마음 나눔, 관리자 편집, 연락처·발송 | **아직 없음** — 백엔드(인증+DB+파일저장) 필요 |
+| 후원/결제 | 넣지 않음 (요청사항) |
+
+## 로컬에서 미리 보기
+```
+cd site && python3 -m http.server 8000
+```
+브라우저에서 http://localhost:8000 (파일을 더블클릭해서 열면 content.json을 못 읽어요)
 
 ## 처음 한 번만 해야 하는 설정
 

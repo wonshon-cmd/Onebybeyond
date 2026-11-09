@@ -1,0 +1,11 @@
+/* Additions for the public build (kept separate from the approved style.css) */
+.hero-visual{cursor:pointer}
+.story-end{display:flex;margin-top:22px}
+.video-card{color:inherit}
+.video-card:hover strong{text-decoration:underline;text-underline-offset:4px}
+.video-thumb{position:relative;flex:0 0 168px;aspect-ratio:16/9;border-radius:5px;overflow:hidden;background:#ddd}
+.video-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.video-thumb .play{position:absolute;inset:0;margin:auto;width:42px;height:42px;border-radius:50%;background:#000a;color:#fff;display:grid;place-items:center;font-size:15px;padding-left:3px}
+.video-link{display:inline-block;margin-top:10px;font-size:12px;border-bottom:1px solid var(--ink);padding-bottom:4px}
+.noscript{padding:60px 5%;text-align:center;color:var(--muted)}
+@media (max-width:600px){.video-thumb{flex-basis:100%}}
