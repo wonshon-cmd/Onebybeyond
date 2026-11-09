@@ -29,7 +29,8 @@ design-package/      ← 받은 인계 패키지 원본 (배포되지 않음)
 | 공유 (휴대폰 공유 메뉴 / 링크 복사) | 동작 |
 | 사진 갤러리 크게 보기 | 동작 |
 | 유튜브 ‘무명’ 미리보기 + YouTube로 이동 | 동작 |
-| 로그인, 댓글/마음 나눔, 관리자 편집, 연락처·발송 | **아직 없음** — 백엔드(인증+DB+파일저장) 필요 |
+| 마음 나눔 (Google 로그인 후 이름과 함께 글 남기기, 공개/비공개 선택) | 코드 완료 — **아래 Supabase 설정 후 켜짐**. 설정 전에는 "준비 중"으로 표시 |
+| 관리자 편집, 연락처·발송 | **아직 없음** |
 | 후원/결제 | 넣지 않음 (요청사항) |
 
 ## 로컬에서 미리 보기
@@ -73,3 +74,31 @@ DNS 반영에는 몇 분~최대 48시간 걸릴 수 있습니다.
 
 ## 업데이트 방법
 `site/` 안의 파일을 수정해서 `main` 에 push 하면 1~2분 안에 자동으로 반영됩니다.
+
+## 마음 나눔(댓글) 켜기 — Supabase + Google 로그인
+
+방문자는 Google로 로그인해야 글을 남길 수 있고, 글마다 **공개**(모두에게 보임) 또는 **비공개**(쓴 사람과 관리자만 보임)를 고릅니다.
+비공개 여부는 브라우저가 아니라 데이터베이스 규칙(RLS)이 막기 때문에, 다른 사람이 비공개 글을 몰래 볼 수 없습니다.
+
+### 1. Supabase 프로젝트 만들기
+1. https://supabase.com 가입 → **New project** (지역: 가까운 곳, 비밀번호는 따로 보관)
+2. 왼쪽 **SQL Editor** → `supabase/schema.sql` 내용을 전부 붙여넣고 **Run**
+3. 같은 곳에서 관리자(비공개 글을 볼 사람) Google 이메일 등록:
+   ```sql
+   insert into public.admins (email) values ('관리자이메일@gmail.com');
+   ```
+
+### 2. Google 로그인 연결
+1. https://console.cloud.google.com → 새 프로젝트
+2. **APIs & Services → OAuth consent screen**: External, 앱 이름 `One to Beyond`, 이메일 입력 → 저장 후 **Publish app**
+3. **Credentials → Create credentials → OAuth client ID** → Web application
+   - Authorized redirect URIs: `https://<프로젝트ID>.supabase.co/auth/v1/callback`
+     (Supabase → Authentication → Providers → Google 화면에 정확한 주소가 나옵니다)
+4. 만들어진 **Client ID / Client secret**을 Supabase → **Authentication → Providers → Google**에 붙여넣고 Enable
+5. Supabase → **Authentication → URL Configuration**
+   - Site URL: `https://onetobeyond.org`
+   - Redirect URLs: `https://onetobeyond.org/**` 추가
+
+### 3. 사이트에 연결
+Supabase → **Project Settings → API**의 `Project URL`과 `anon public` 키를 `site/config.js`에 넣고 `main`에 반영합니다.
+(anon 키는 공개해도 되는 키입니다. `service_role` 키는 절대 넣지 마세요.)
