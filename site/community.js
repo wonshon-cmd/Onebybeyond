@@ -55,7 +55,7 @@
 
   async function api(path, opts = {}) {
     const s = await validSession();
-    const headers = { apikey: KEY, Authorization: 'Bearer ' + (s ? s.access_token : KEY), 'Content-Type': 'application/json', ...(opts.headers || {}) };
+    const headers = { apikey: KEY, ...(s ? { Authorization: 'Bearer ' + s.access_token } : {}), 'Content-Type': 'application/json', ...(opts.headers || {}) };
     const r = await fetch(URL_ + path, { ...opts, headers });
     if (!r.ok) { let m = ''; try { m = (await r.json()).message || ''; } catch {} throw Error(m || ('HTTP ' + r.status)); }
     return r.status === 204 ? null : r.json();

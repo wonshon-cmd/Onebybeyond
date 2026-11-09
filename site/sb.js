@@ -34,7 +34,7 @@
 
     async function api(path, opts = {}) {
       const s = await session();
-      const headers = { apikey: KEY, Authorization: 'Bearer ' + (s ? s.access_token : KEY), ...(opts.body && !(opts.body instanceof Blob) ? { 'Content-Type': 'application/json' } : {}), ...(opts.headers || {}) };
+      const headers = { apikey: KEY, ...(s ? { Authorization: 'Bearer ' + s.access_token } : {}), ...(opts.body && !(opts.body instanceof Blob) ? { 'Content-Type': 'application/json' } : {}), ...(opts.headers || {}) };
       const r = await fetch(URL_ + path, { ...opts, headers });
       if (!r.ok) throw await errorOf(r);
       if (r.status === 204) return null;
