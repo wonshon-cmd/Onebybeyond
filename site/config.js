@@ -5,4 +5,5 @@
 window.OTB_CONFIG = {
   supabaseUrl: '',      // e.g. 'https://abcdefgh.supabase.co'
   supabaseAnonKey: '',  // Project Settings → API → anon public key
+  adminLoginEmail: 'admin@onetobeyond.org', // the Supabase user whose password is the admin access code
 };

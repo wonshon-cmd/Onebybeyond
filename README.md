@@ -1,104 +1,84 @@
-# Onebybeyond
+# One to Beyond
 
-[onetobeyond.org](https://onetobeyond.org) 웹사이트 소스입니다.
+[onetobeyond.org](https://onetobeyond.org) — 코트디부아르에서 보내는 기도편지 사이트.
+
+- 호스팅: **Netlify** (`site/` 폴더를 그대로 올림)
+- 데이터·로그인·사진: **Supabase** (무료 요금제)
+- 도메인: Squarespace (A `@` → `75.2.60.5`, CNAME `www` → Netlify 주소)
 
 ## 구조
 
 ```
-site/                ← 웹사이트에 올라가는 파일 전부 (이 폴더가 그대로 배포됨)
-  index.html         ← 페이지 뼈대
-  content.json       ← 편지 글·기도제목·사진 경로 (글 수정은 여기서)
-  style.css          ← 승인된 디자인 (Off-white Editorial Letter)
-  site.css           ← 공개용으로 추가한 작은 스타일
-  app.js             ← 화면 그리기, 하트/아멘/공유/사진/목차
-  assets/            ← 로고, 파비콘, 사진
-  404.html, CNAME
-design-package/      ← 받은 인계 패키지 원본 (배포되지 않음)
-  reference/approved-design.html  ← 디자인 최우선 기준
-  admin.html         ← 관리자 기능 참고 데모
-  AI-HANDOFF-KO.txt, DESIGN-SYSTEM.md, README-KO.md
-.github/workflows/deploy.yml  ← main 브랜치에 push 하면 GitHub Pages로 자동 배포
+site/                     ← Netlify에 올리는 폴더 전체
+  index.html, app.js      ← 방문자 화면
+  render.js               ← 소식지 화면 그리기 (방문자 화면과 관리자 미리보기가 함께 씀)
+  sb.js                   ← Supabase 연결
+  community.js            ← 마음 나눔 (Google 로그인, 공개/비공개)
+  config.js               ← Supabase 주소와 공개 키 (여기만 채우면 연결됨)
+  content.json            ← Supabase 연결 전·장애 시 보여줄 기본 소식지
+  style.css               ← 승인된 Off-white Editorial Letter 디자인
+  site.css                ← 추가 스타일
+  admin/                  ← 관리자 화면 (onetobeyond.org/admin)
+  _headers                ← Netlify 보안 헤더
+supabase/
+  schema.sql              ← 데이터베이스 표와 권한 규칙
+  seed.sql                ← 첫 번째 소식지 넣기
+  functions/send-newsletter/index.ts ← 이메일 발송 함수
+design-package/           ← 받은 인계 패키지 원본 (배포 안 함)
 ```
 
-## 현재 공개 버전에서 되는 것 / 안 되는 것
+## 기능
 
 | 기능 | 상태 |
-|------|------|
-| 표지 → 본문 한 페이지 스크롤, 목차, 소식지 선택, 글자 크기 | 동작 |
-| 이야기 끝 하트, 기도제목 아멘 토글 | 동작 — 단, **방문자 본인 브라우저에만 저장** (모두가 함께 보는 숫자 아님) |
-| 공유 (휴대폰 공유 메뉴 / 링크 복사) | 동작 |
-| 사진 갤러리 크게 보기 | 동작 |
-| 유튜브 ‘무명’ 미리보기 + YouTube로 이동 | 동작 |
-| 마음 나눔 (Google 로그인 후 이름과 함께 글 남기기, 공개/비공개 선택) | 코드 완료 — **아래 Supabase 설정 후 켜짐**. 설정 전에는 "준비 중"으로 표시 |
-| 관리자 편집, 연락처·발송 | **아직 없음** |
-| 후원/결제 | 넣지 않음 (요청사항) |
+|---|---|
+| 표지 → 본문 스크롤, 목차, 소식지 선택, 글자 크기 | 동작 |
+| 이야기 끝 하트, 기도제목 ✧ 아멘 ↔ ✓ 함께 기도했어요 | 동작 (방문자 각자 브라우저에 기억) |
+| 공유 (휴대폰 공유 창 / 링크 복사) | 동작 |
+| 사진 갤러리, 이야기별 사진, 유튜브 미리보기 | 동작 |
+| 새 소식 받기 (이메일 구독 신청) | Supabase 연결 후 |
+| 마음 나눔 (Google 로그인, 공개/비공개) | Supabase + Google 설정 후 |
+| 관리자: 접속 코드 로그인, 소식지 작성·편집·서식, 초안/공개 분리, 미리보기, 사진 업로드, 순서·첫 화면 선택 | Supabase 연결 후 |
+| 관리자: 주소록, 그룹, 새 구독자, 수신자 선택 | Supabase 연결 후 |
+| 이메일 발송 | Supabase + Resend 설정 후 |
+| 카카오톡 | 공유 창으로 직접 보내기 (자동 일괄 발송은 비즈메시지 계약 필요 — 미연결) |
+| 후원/결제 | 넣지 않음 |
+
+## Supabase 연결 (한 번만)
+
+1. **SQL Editor** → New query → `supabase/schema.sql` 전체 붙여넣기 → **Run**
+2. 다시 New query → `supabase/seed.sql` 붙여넣기 → **Run** (첫 번째 소식지가 들어갑니다)
+3. **Authentication → Users → Add user → Create new user**
+   - Email: `admin@onetobeyond.org` / Password: **관리자 접속 코드** / **Auto Confirm User** 체크
+   - 이 비밀번호가 곧 `onetobeyond.org/admin` 접속 코드입니다. 코드는 관리자 화면 ‘설정’에서 바꿀 수 있어요.
+4. **Authentication → URL Configuration**: Site URL `https://onetobeyond.org`, Redirect URLs에 `https://onetobeyond.org/**`
+5. **Authentication → Sign In / Providers → Email**: ‘Confirm email’은 켜 둔 채로 두세요.
+6. **Project Settings → API**의 `Project URL`과 `anon public` 키를 `site/config.js`에 넣고 Netlify에 다시 올립니다.
+   (`anon` 키는 공개용입니다. `service_role` 키는 절대 넣지 마세요.)
+
+## 마음 나눔 Google 로그인 켜기
+
+1. https://console.cloud.google.com → 새 프로젝트 → **APIs & Services → OAuth consent screen** (External, 앱 이름 `One to Beyond`) → Publish
+2. **Credentials → Create credentials → OAuth client ID → Web application**
+   - Authorized redirect URI: `https://<프로젝트ID>.supabase.co/auth/v1/callback` (Supabase의 Google 설정 화면에 정확한 주소가 나옵니다)
+3. Client ID / Secret을 Supabase **Authentication → Providers → Google**에 넣고 Enable
+
+비공개 글은 쓴 사람과 `admins` 표에 있는 이메일(관리자 화면 ‘설정’)만 볼 수 있어요.
+
+## 이메일 발송 켜기
+
+1. https://resend.com 가입 → **Domains → Add domain** `onetobeyond.org` → 안내되는 DNS 레코드를 Squarespace에 추가
+   - 이때 Squarespace의 **Email Security** 묶음(`v=spf1 -all`, DMARC `p=reject`)이 발송을 막으므로 Resend 안내에 맞게 바꿔야 합니다.
+2. Resend **API Keys** → 키 만들기
+3. Supabase **Edge Functions → Deploy a new function → Via editor** → 이름 `send-newsletter` → `supabase/functions/send-newsletter/index.ts` 내용 붙여넣기 → Deploy
+4. Supabase **Edge Functions → Secrets**: `RESEND_API_KEY` = 키, `MAIL_FROM` = `One to Beyond <letters@onetobeyond.org>`
+
+## 배포 (Netlify)
+
+`site/` 폴더를 https://app.netlify.com 의 프로젝트 **Deploys** 화면에 끌어다 놓으면 새 버전이 올라갑니다.
 
 ## 로컬에서 미리 보기
+
 ```
 cd site && python3 -m http.server 8000
 ```
-브라우저에서 http://localhost:8000 (파일을 더블클릭해서 열면 content.json을 못 읽어요)
-
-## 처음 한 번만 해야 하는 설정
-
-### 1. GitHub Pages 켜기
-GitHub 저장소 → **Settings → Pages**
-- **Source**: `GitHub Actions` 선택
-- **Custom domain**: `onetobeyond.org` 입력 후 Save
-- DNS 확인이 끝나면 **Enforce HTTPS** 체크
-
-### 2. 도메인 DNS 설정 (Squarespace)
-
-1. https://account.squarespace.com/domains 로그인 → `onetobeyond.org` 선택
-2. 왼쪽 메뉴 **DNS** → **DNS Settings**
-3. **Squarespace Defaults** 묶음이 있으면 오른쪽 휴지통으로 삭제 (Squarespace 사이트를 안 쓰므로)
-4. **Domain Forwarding**(도메인 포워딩)이 켜져 있으면 끄기
-5. **Custom records** → **Add record** 로 아래 9개 추가 (Host 칸에 `@` 그대로 입력)
-
-Squarespace에서 이메일(Google Workspace 등)을 쓰고 있다면 MX/TXT 레코드는 지우지 마세요.
-
-| Type  | Host / Name | Value                    |
-|-------|-------------|--------------------------|
-| A     | `@`         | `185.199.108.153`        |
-| A     | `@`         | `185.199.109.153`        |
-| A     | `@`         | `185.199.110.153`        |
-| A     | `@`         | `185.199.111.153`        |
-| AAAA  | `@`         | `2606:50c0:8000::153`    |
-| AAAA  | `@`         | `2606:50c0:8001::153`    |
-| AAAA  | `@`         | `2606:50c0:8002::153`    |
-| AAAA  | `@`         | `2606:50c0:8003::153`    |
-| CNAME | `www`       | `wonshon-cmd.github.io`  |
-
-기존에 `@` 에 걸려있는 기본 A 레코드(주차 페이지 등)는 삭제하세요.
-DNS 반영에는 몇 분~최대 48시간 걸릴 수 있습니다.
-
-## 업데이트 방법
-`site/` 안의 파일을 수정해서 `main` 에 push 하면 1~2분 안에 자동으로 반영됩니다.
-
-## 마음 나눔(댓글) 켜기 — Supabase + Google 로그인
-
-방문자는 Google로 로그인해야 글을 남길 수 있고, 글마다 **공개**(모두에게 보임) 또는 **비공개**(쓴 사람과 관리자만 보임)를 고릅니다.
-비공개 여부는 브라우저가 아니라 데이터베이스 규칙(RLS)이 막기 때문에, 다른 사람이 비공개 글을 몰래 볼 수 없습니다.
-
-### 1. Supabase 프로젝트 만들기
-1. https://supabase.com 가입 → **New project** (지역: 가까운 곳, 비밀번호는 따로 보관)
-2. 왼쪽 **SQL Editor** → `supabase/schema.sql` 내용을 전부 붙여넣고 **Run**
-3. 같은 곳에서 관리자(비공개 글을 볼 사람) Google 이메일 등록:
-   ```sql
-   insert into public.admins (email) values ('관리자이메일@gmail.com');
-   ```
-
-### 2. Google 로그인 연결
-1. https://console.cloud.google.com → 새 프로젝트
-2. **APIs & Services → OAuth consent screen**: External, 앱 이름 `One to Beyond`, 이메일 입력 → 저장 후 **Publish app**
-3. **Credentials → Create credentials → OAuth client ID** → Web application
-   - Authorized redirect URIs: `https://<프로젝트ID>.supabase.co/auth/v1/callback`
-     (Supabase → Authentication → Providers → Google 화면에 정확한 주소가 나옵니다)
-4. 만들어진 **Client ID / Client secret**을 Supabase → **Authentication → Providers → Google**에 붙여넣고 Enable
-5. Supabase → **Authentication → URL Configuration**
-   - Site URL: `https://onetobeyond.org`
-   - Redirect URLs: `https://onetobeyond.org/**` 추가
-
-### 3. 사이트에 연결
-Supabase → **Project Settings → API**의 `Project URL`과 `anon public` 키를 `site/config.js`에 넣고 `main`에 반영합니다.
-(anon 키는 공개해도 되는 키입니다. `service_role` 키는 절대 넣지 마세요.)
+http://localhost:8000 (관리자: http://localhost:8000/admin/)
