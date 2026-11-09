@@ -14,7 +14,7 @@
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const st = {
     letterId: null, loadedFor: null, loading: false, error: '',
-    posts: [], filter: 'all', session: null, user: null, isAdmin: false,
+    posts: [], filter: 'all', session: null, user: null, isAdmin: false, googleReady: true,
     draft: { name: '', body: '', kind: 'sharing', visibility: 'public' }, sending: false, formError: '',
   };
 
@@ -59,6 +59,13 @@
     const r = await fetch(URL_ + path, { ...opts, headers });
     if (!r.ok) { let m = ''; try { m = (await r.json()).message || ''; } catch {} throw Error(m || ('HTTP ' + r.status)); }
     return r.status === 204 ? null : r.json();
+  }
+
+  async function checkGoogle() {
+    try {
+      const r = await fetch(`${URL_}/auth/v1/settings`, { headers: { apikey: KEY } });
+      if (r.ok) { const d = await r.json(); st.googleReady = !!(d.external && d.external.google); }
+    } catch {}
   }
 
   async function loadUser() {
@@ -144,6 +151,7 @@
 <label class="c-choice"><input type="radio" name="c-vis" data-f="visibility" value="private" ${d.visibility === 'private' ? 'checked' : ''}><span><b>비공개</b><small>선교사 가정과 나만 볼 수 있어요</small></span></label></fieldset>
 <div class="form-error" role="alert">${esc(st.formError)}</div>
 <button class="btn" type="submit" ${st.sending ? 'disabled' : ''}>${st.sending ? '남기는 중…' : '마음 남기기 ↗'}</button></form>`
+      : !st.googleReady ? `<div class="login-callout"><p>마음을 남기는 Google 로그인을 준비하고 있어요.<br><small class="help">곧 이름과 함께 안부를 남길 수 있어요.</small></p></div>`
       : `<div class="login-callout"><p>Google 계정으로 로그인하면 이름과 함께 마음을 남길 수 있어요.<br><small class="help">공개 또는 비공개(선교사 가정에게만)로 남길 수 있어요.</small></p><button class="btn google-btn compact" data-c="signin"><span class="google-logo">G</span> Google로 로그인</button></div>`;
 
     const posts = st.posts, shown = posts.filter(p => st.filter === 'all' || p.kind === st.filter);
@@ -184,7 +192,7 @@
 
   // ---------- public hooks used by app.js ----------
   if (enabled) takeTokensFromUrl(); else if (location.hash.includes('access_token=')) history.replaceState(null, '', location.pathname);
-  const ready = enabled ? loadUser() : Promise.resolve();
+  const ready = enabled ? Promise.all([loadUser(), checkGoogle()]) : Promise.resolve();
 
   window.OTBCommunity = {
     mount(letterId) {
