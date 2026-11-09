@@ -46,7 +46,15 @@ GitHub 저장소 → **Settings → Pages**
 - **Custom domain**: `onebybeyond.org` 입력 후 Save
 - DNS 확인이 끝나면 **Enforce HTTPS** 체크
 
-### 2. 도메인 DNS 설정 (도메인 산 곳의 DNS 관리 화면에서)
+### 2. 도메인 DNS 설정 (Squarespace)
+
+1. https://account.squarespace.com/domains 로그인 → `onebybeyond.org` 선택
+2. 왼쪽 메뉴 **DNS** → **DNS Settings**
+3. **Squarespace Defaults** 묶음이 있으면 오른쪽 휴지통으로 삭제 (Squarespace 사이트를 안 쓰므로)
+4. **Domain Forwarding**(도메인 포워딩)이 켜져 있으면 끄기
+5. **Custom records** → **Add record** 로 아래 9개 추가 (Host 칸에 `@` 그대로 입력)
+
+Squarespace에서 이메일(Google Workspace 등)을 쓰고 있다면 MX/TXT 레코드는 지우지 마세요.
 
 | Type  | Host / Name | Value                    |
 |-------|-------------|--------------------------|
