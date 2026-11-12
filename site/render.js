@@ -110,7 +110,7 @@
     } catch {}
     return /^[\w-]{11}$/.test(url.trim()) ? url.trim() : '';
   }
-  const safeUrl = u => /^(https:\/\/|\/(?!\/))/.test(String(u || '')) ? String(u) : '';
+  const safeUrl = u => /^(https:\/\/|\/(?!\/)|data:image\/(jpeg|png|webp|gif);base64,)/.test(String(u || '')) ? String(u) : '';
 
   // ---------- letter page ----------
   // ctx: { react(type,id,label) -> html, share() -> html }
